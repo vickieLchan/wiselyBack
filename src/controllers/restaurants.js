@@ -1,20 +1,37 @@
 import express from 'express';
+
 import { getDb } from '../../db/index.js';
+import { convertId } from '../utils/index.js';
+import inventoryRouter from './inventory.js';
+import reservationRouter from './reservations.js';
 
-const restaurants = express.Router()
+const controllerName = 'restaurants'
+const restaurantsRouter = express.Router()
 
-restaurants.get('/', async (req, res, next) => {
+restaurantsRouter.use('/:restaurantId/inventory', inventoryRouter);
+restaurantsRouter.use('/:restaurantId/reservations', reservationRouter);
+
+restaurantsRouter.get('/:restaurantId', async (req, res, next) => {
+  const { restaurantId } = req.params
+  console.log('idRoute', restaurantId)
+  const db = getDb()
   try {
-    console.log('madeIt')
-    const db = getDb()
-    console.log(db)
-    const restaurants = await db.restaurants.findAll()
-    console.log(restaurants)
-    res.status(200).send(restaurants)
+    const restaurant = await getRestaurant(db, convertId(restaurantId))
+    res.status(200).json(restaurant)
   } catch (err) {
-    console.log('err--->', err)
     next(err)
   }
 });
 
-export default restaurants;
+restaurantsRouter.get('/', async (req, res, next) => {
+  console.log('/ route')
+  try {
+    const db = await getDb()
+    const restaurants = await db.collection(controllerName).find().toArray()
+    res.status(200).json(restaurants)
+  } catch (err) {
+    next(err)
+  }
+});
+
+export default restaurantsRouter;

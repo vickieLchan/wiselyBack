@@ -10,11 +10,9 @@ export default async (dbName = 'reservations') => {
   if (!client || !db) {
     client = new MongoClient(url);
 
-    await client.connect(async function (err) {
-      console.log('Connected successfully to server');
+    await client.connect();
 
-      db = client.db(dbName);
-    });
+    db = await client.db(dbName);
   }
 
   return db

@@ -28,14 +28,14 @@ export default async (db) => {
       validator: {
         $jsonSchema: {
           bsonType: "object",
-          required: ["date", "restaurant", "bucketNum", "isDefault"],
+          required: ["date", "availability", "reserved", "is_default", "restaurant_id"],
           properties: {
             date: {
               bsonType: "date",
               description: "date of the available inventory, required"
             },
             restaurant_id: {
-              bsonType: "int",
+              bsonType: "objectId",
               description: "the id of the restaurant, required"
             },
             availability: {
@@ -43,7 +43,6 @@ export default async (db) => {
               description: "the maximum inventory for all buckets",
               minItems: 96,
               maxItems: 96,
-              uniqueItems: false,
               items: {
                 bsonType: "int",
                 description: "the number of reservations available",
@@ -54,17 +53,16 @@ export default async (db) => {
               description: "current reservations",
               minItems: 96,
               maxItems: 96,
-              uniqueItems: true,
               items: {
                 bsonType: "array",
                 description: "an array of the reservation ids",
                 items: {
-                  bsonType: "string",
+                  bsonType: "objectId",
                   description: "reservation id"
                 }
               }
             },
-            isDefault: {
+            is_default: {
               bsonType: "bool",
               description: "the default inventory for a given day"
             }
@@ -76,8 +74,12 @@ export default async (db) => {
       validator: {
         $jsonSchema: {
           bsonType: "object",
-          required: ["name", "partySize", "email", "date"],
+          required: ["name", "party_size", "email", "date", "restaurant_id"],
           properties: {
+            restaurant_id: {
+              bsonType: "objectId",
+              description: "the id of the restaurant, required"
+            },
             name: {
               bsonType: "string",
               description: "must be a string and is required"
